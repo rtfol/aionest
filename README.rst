@@ -88,15 +88,17 @@ Usage
     import asyncio
     
     async def nest_update():
-        nest_api = aionest.NestApi(product_id=product_id)
+        nest_api = aionest.NestApi(product_id)
         print('Go to {} to authorize, then enter PIN below'.format(nest_api.get_authorize_url()))
         pin = input("PIN: ")
-        access_token, expires_in = await nest_api.authenticate(pin, product_secret)
-
         # you can cache access_token future reuse
-        nest_api = aionest.NestApi(access_token=access_token)
-        async for event in nest_api:
-            print(event.data)
+        access_token, expires_in = await nest_api.authenticate(pin, product_secret)
+        nest_api.connect()
+        try:
+            async for event in nest_api:
+                print(event.data)
+        finally:
+            nest_api.close()
 
     event_loop = asyncio.get_event_loop()
     try:
