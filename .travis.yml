@@ -16,17 +16,12 @@ cache:
 language: python
 install: pip install -U tox-travis
 script: travis_wait 30 tox --develop
-
-# Assuming you have installed the travis-ci CLI tool, after you
-# create the Github repo and add it to Travis, run the
-# following command to finish PyPI deployment setup:
-# $ travis encrypt --add deploy.password
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
   user: awarecan
   password:
-    secure: PLEASE_REPLACE_ME
+    secure: Y8SJk0cu382IbhkOrlD0XYssRUuwhimCne7+ZNy2Wv6Q58acXkv7Ts64KeiqWvR2gzGbJRn9UXOF2vD10HDSFfxqZqnhlxYjdnlnuJUAE/IB7502txKMvSkhessnZTa3nE1OX8wKVsQwbS+LM+L65I8EF3kohL94j8uqlzFzq3TW5A9mKsyGUXi1PpIpX7HMxp5ZZOLs7kkymNWRAhrDnGd0xmVBtyiVOlquUGLUDGvvnxbVzwM6JIJOy/a117KzPFFaKCn75PW7Qf1B+qKKQRPJRoASw0VBDJ8ljAO+Z8d4G6zhXwBGqNg+Mrz1a+ouveFrJXQE5XRtdo5766E82j81E3/xFmq7XlXSVy0xkDMo97ma8bOt4/gKllRGKQPdwLL54Bf0P/qLYJoRUpyjNkW+Kgkqser1teJgk1ibOBgbCiye4ty/Cn+l5FQ9oF6xxY5DF/jLoz/mMGIjiyOi8Ht1T9ZOaRrhCQLMw9tjHZBtXGkPx8BY6kUXE0ER7VDOABX36FDf+avpIwlaxn6NjdgFQVPQYzdzV6nQOErZfEkwBaRPltlf+fJ4yb/Kih0My546ldQgdhA+/0btOPkXNKStzJY36EtAgQ2bU7LDLPsCVdwvWUajJ2i4qZDCpJPItXJAnsDha99IpLUJLmi01HMiu/Haau+6RByqoVmXi1Y=
   on:
     tags: true
     repo: rtfol/aionest
