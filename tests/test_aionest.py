@@ -2,24 +2,16 @@
 # -*- coding: utf-8 -*-
 
 """Tests for `aionest` package."""
-
-import pytest
-
-
-from aionest import aionest
+from aionest import NestApi
 
 
-@pytest.fixture
-def response():
-    """Sample pytest fixture.
+def test_init():
+    """Test init."""
+    nest_api = NestApi()
+    assert nest_api is not None
 
-    See more at: http://doc.pytest.org/en/latest/fixture.html
-    """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
+    nest_api = NestApi(product_id="product-id")
+    assert nest_api is not None
 
-
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument."""
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
+    nest_api = NestApi(access_token="access-token")
+    assert nest_api is not None

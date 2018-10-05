@@ -16,26 +16,26 @@ LOGIN_URL = 'https://home.nest.com/user/login'
 _LOGGER = logging.getLogger(__name__)
 
 
-class NestApi(object)
+class NestApi(object):
     """Represent Nest API."""
     def __init__(self, product_id=None, access_token=None, web_session=None):
-         """Initialize Nest API.
+        """Initialize Nest API.
          
-         :param product_id: Product ID
-         :param access_token: Access Token
-         :param web_sesion: aiohttp Client Session
-         """
-         self._product_id = product_id
-         self._product_secret = product_secret
-         self._access_token = access_token
-         self._need_close_session = web_session is None
-         self._web_session = web_session or aiohttp.ClientSession()
-         self._event_stream = None
+        :param product_id: Product ID
+        :param access_token: Access Token
+        :param web_session: aiohttp Client Session
+        """
+        self._product_id = product_id
+        self._access_token = access_token
+        self._need_close_session = web_session is None
+        self._web_session = web_session
+        self._event_stream = None
+        self._auth_state = None
          
     def get_authorize_url(self, state=None):
         """Generate authorize URL."""
         self._auth_state = state or str(uuid.uuid4())
-        return AUTHORIZE_URL.format(self._client_id, self._auth_state)
+        return AUTHORIZE_URL.format(self._product_id, self._auth_state)
 
     async def authenticate(self, pin, product_secret, state=None):
         """Authenticate via given pin, product id and secret.
@@ -43,8 +43,11 @@ class NestApi(object)
         return (access_token, expires_in) if authentication passed
         return None if failed
         """
-        if state is not None and state != self._state:
+        if state is not None and state != self._auth_state:
             raise ValueError('state is not correct')
+
+        if self._web_session is None:
+            self._web_session = aiohttp.ClientSession()
             
         data = {'client_id': self._product_id,
                 'client_secret': product_secret,
@@ -61,7 +64,10 @@ class NestApi(object)
         return self
 
     async def connect(self):
-        """Conenct to Nest Stream API."""
+        """Connect to Nest Stream API."""
+        if self._web_session is None:
+            self._web_session = aiohttp.ClientSession()
+
         self._event_stream = sse_client.EventSource(
             API_URL + '/', headers={'Authorization': 'Bearer {}'.format(
                 self._access_token)})
@@ -70,7 +76,7 @@ class NestApi(object)
     async def __anext__(self):
         """Process events."""
         async for event in self._event_stream:
-            event_type = event.event
+            event_type = event.type
             if event_type == 'open' or event_type == 'keep-alive':
                 continue
             elif event_type == 'auth_revoked':
@@ -78,5 +84,4 @@ class NestApi(object)
             elif event_type == 'error':
                 raise ValueError(event.data)
             elif event_type == 'put':
-                queue.appendleft(json.loads(event.data))
                 return event.data
